@@ -1,18 +1,5 @@
 defmodule RedisZ do
   @moduledoc """
-  Documentation for RedisZ.
+  Redis Super
   """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> RedisZ.hello
-      :world
-
-  """
-  def hello do
-    :world
-  end
 end

@@ -1,21 +1,39 @@
-# RedisZ
+RedisZ - Redis Super
+==
+Full featured Redis adapter for Elixir based on [Redix][Redix].
 
-**TODO: Add description**
+* No downgrade from Redix: pipeline concurrency & auto reconnection.
+* Parallel connection pooling.
+* Sharding support.
+* Auto reconnect at Amazon ElastiCache Multi-AZ failover.
 
-## Installation
+※ This is beta quality.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `redis_z` to your list of dependencies in `mix.exs`:
+[![Hex.pm](https://img.shields.io/hexpm/v/redis_z.svg)](https://hex.pm/packages/redis_z)
+[![Build Status](https://travis-ci.org/ne-sachirou/redis_z.svg?branch=master)](https://travis-ci.org/ne-sachirou/redis_z)
 
-```elixir
-def deps do
-  [
-    {:redis_z, "~> 0.1.0"}
-  ]
-end
-```
+Usage
+--
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/redis_z](https://hexdocs.pm/redis_z).
+Installation
+--
 
+Architecture
+--
+![processes](./processes.png)
+
+TODO
+--
+* [ ] Redis sentinel support.
+* [ ] Redis cluster support.
+* [ ] Online resharding.
+* [ ] Controll connection pool size dynamically.
+* [ ] Support commands for multiple shards.
+* [ ] MULTI EXEC support.
+* [ ] BLPOP BRPOP BRPOPLPUSH support.
+* [ ] SCAN support
+* [ ] ~~PubSub support.~~ Use [Redix.PubSub][Redix.PubSub] & [Phoenix.PubSub.RedisZ][Phoenix.PubSub.RedisZ].
+
+[Redix]: https://hex.pm/packages/redix
+[Redix.PubSub]: https://hex.pm/redix_pubsub
+[Phoenix.PubSub.RedisZ]: https://hex.pm/packages/phoenix_pubsub_redis_z

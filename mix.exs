@@ -5,7 +5,7 @@ defmodule RedisZ.MixProject do
     [
       app: :redis_z,
       deps: deps(),
-      description: "",
+      description: "Redis Super: Full featured Redis adapter for Elixir based on Redix",
       dialyzer: [ignore_warnings: "dialyzer.ignore-warnings"],
       elixir: "~> 1.5",
       package: package(),
@@ -17,7 +17,7 @@ defmodule RedisZ.MixProject do
       ],
       start_permanent: Mix.env() == :prod,
       test_coverage: [tool: ExCoveralls],
-      version: "0.1.0",
+      version: "0.1.0-beta",
 
       # Docs
       docs: [
@@ -30,16 +30,13 @@ defmodule RedisZ.MixProject do
     ]
   end
 
-  def application do
-    [
-      extra_applications: [:logger],
-      mod: {RedisZ.Application, []}
-    ]
-  end
+  def application, do: [extra_applications: [:logger]]
 
   defp deps do
     [
-      {:inner_cotton, github: "ne-sachirou/inner_cotton", only: [:dev, :test]}
+      {:ex_doc, "~> 0.18", only: :dev, runtime: false},
+      {:inner_cotton, github: "ne-sachirou/inner_cotton", only: [:dev, :test]},
+      {:redix, "~> 0.6"}
     ]
   end
 

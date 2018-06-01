@@ -7,7 +7,7 @@ defmodule RedisZ.MixProject do
       deps: deps(),
       description: "Redis Super: Full featured Redis adapter for Elixir based on Redix",
       dialyzer: [ignore_warnings: "dialyzer.ignore-warnings"],
-      elixir: "~> 1.5",
+      elixir: "~> 1.6",
       package: package(),
       preferred_cli_env: [
         coveralls: :test,

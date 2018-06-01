@@ -35,7 +35,7 @@ defmodule RedisZ do
     unless is_list(args[:urls]) or is_binary(args[:urls]),
       do: raise(ArgumentError, message: "Should have is_list(:urls) or is_binary(:urls)")
 
-    unless is_integer(args[:pool_size]) and args[:pool_size] > 0,
+    unless is_nil(args[:pool_size]) or (is_integer(args[:pool_size]) and args[:pool_size] > 0),
       do: raise(ArgumentError, message: "Should have is_integer(:pool_size) and :pool_size > 0")
 
     args =
@@ -44,6 +44,7 @@ defmodule RedisZ do
         urls when is_binary(urls) -> String.split(urls, ~r/\s*,\s*/, trim: true)
         urls -> urls
       end)
+      |> update_in([:pool_size], &(&1 || 1))
       |> put_in([:diagnoser_name], :"#{args[:server_name]}.Diagnoser")
       |> put_in([:shards_name], :"#{args[:server_name]}.Shards")
 

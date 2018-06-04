@@ -67,5 +67,5 @@ TODO
 * [ ] ~~PubSub support.~~ Use [Redix.PubSub][Redix.PubSub] & [Phoenix.PubSub.RedisZ][Phoenix.PubSub.RedisZ].
 
 [Redix]: https://hex.pm/packages/redix
-[Redix.PubSub]: https://hex.pm/redix_pubsub
+[Redix.PubSub]: https://hex.pm/packages/redix_pubsub
 [Phoenix.PubSub.RedisZ]: https://hex.pm/packages/phoenix_pubsub_redis_z

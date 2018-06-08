@@ -4,11 +4,15 @@ defmodule RedisZ.Server do
 
   use GenServer
 
+  @type name :: GenServer.server()
+
   @type t :: %{store: :ets.tab()}
 
+  @doc false
   @spec start_link(keyword) :: GenServer.on_start()
   def start_link(args), do: GenServer.start_link(__MODULE__, args, name: args[:server_name])
 
+  @doc false
   @spec init(keyword) :: {:ok, t}
   def init(args) do
     tab = :ets.new(args[:server_name], [:named_table, read_concurrency: true])

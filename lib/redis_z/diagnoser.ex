@@ -5,28 +5,32 @@ defmodule RedisZ.Diagnoser do
 
   use GenServer
 
+  @type name :: GenServer.server()
+
   @type t :: %{
-          name: atom,
-          recovering: %{atom => [GenServer.from()]}
+          name: name(),
+          recovering: %{GenServer.server() => [GenServer.from()]}
         }
 
   @elasticache_readonly_error "READONLY You can't write against a read only slave."
   @reconnect_interval 100
   @reconnect_times Integer.floor_div(5000, @reconnect_interval) - 1
 
+  @doc false
   @spec start_link(keyword) :: GenServer.on_start()
   def start_link(args), do: GenServer.start_link(__MODULE__, args, name: args[:diagnoser_name])
 
+  @doc false
   @spec init(keyword) :: {:ok, t}
   def init(args), do: {:ok, %{name: args[:diagnoser_name], recovering: %{}}}
 
   @doc """
   """
-  @spec diagnose(atom, atom, Exception.t() | :noproc) :: :recovered | :error
+  @spec diagnose(name, GenServer.server(), Exception.t() | :noproc) :: :recovered | :error
   def diagnose(diagnoser, redix_conn, error),
     do: GenServer.call(diagnoser, {:diagnose, redix_conn, error})
 
-  @spec handle_call({:diagnose, atom, Exception.t() | :noproc}, GenServer.from(), t) ::
+  @spec handle_call({:diagnose, GenServer.server(), Exception.t() | :noproc}, GenServer.from(), t) ::
           {:noreply, t} | {:reply, :error, t}
   def handle_call({:diagnose, redix_conn, :noproc}, from, state) do
     if Map.has_key?(state.recovering, redix_conn) do
@@ -53,7 +57,8 @@ defmodule RedisZ.Diagnoser do
     end
   end
 
-  @spec handle_cast({:recover_result, atom, :recovered | :error}, t) :: {:noreply, t}
+  @spec handle_cast({:recover_result, GenServer.server(), :recovered | :error}, t) ::
+          {:noreply, t}
   def handle_cast({:recover_result, redix_conn, response}, state) do
     {from_processes, state} = pop_in(state.recovering[redix_conn])
     Enum.each(from_processes, &GenServer.reply(&1, response))

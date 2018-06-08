@@ -4,6 +4,7 @@ defmodule RedisZ.PoolStarter do
 
   use Task, restart: :transient
 
+  @doc false
   @spec start_link(keyword) :: {:ok, pid}
   def start_link(args), do: Task.start_link(__MODULE__, :run, [args])
 

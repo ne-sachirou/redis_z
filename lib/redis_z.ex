@@ -3,30 +3,32 @@ defmodule RedisZ do
   RedisZ - Redis Super: Full featured Redis adapter for Elixir based on Redix.
   """
 
-  alias __MODULE__.{Diagnoser, Server, Shard, Shards, ShardsStarter}
+  alias __MODULE__.{Diagnoser, Pool, Server, Shard, Shards, ShardsStarter}
 
   use Supervisor
 
   @type args :: [
-          server_name: atom,
-          shards_name: atom,
-          diagnoser_name: atom,
+          server_name: Server.name(),
+          shards_name: Shards.name(),
+          diagnoser_name: Diagnoser.name(),
           urls: [binary | keyword] | binary,
           pool_size: pos_integer,
           shards: [
-            name: atom,
-            diagnoser_name: atom,
-            pool_name: atom,
+            name: Shard.name(),
+            diagnoser_name: Diagnoser.name(),
+            pool_name: Pool.name(),
             pool_size: pos_integer
           ]
         ]
 
+  @doc false
   @spec start_link(keyword) :: Supervisor.on_start()
   def start_link(args) do
     args = args |> put_in([:server_name], args[:name]) |> Keyword.delete(:name)
     Supervisor.start_link(__MODULE__, args)
   end
 
+  @doc false
   @spec init(keyword) :: {:ok, {:supervisor.sup_flags(), [:supervisor.child_spec()]}} | :ignore
   def init(args) do
     unless is_atom(args[:server_name]),
@@ -60,34 +62,36 @@ defmodule RedisZ do
 
   @doc """
   """
-  @spec pipeline(atom, [Redix.command()], keyword) ::
+  @spec pipeline(Server.name(), [Redix.command()], keyword) ::
           {:ok, [Redix.Protocol.redis_value()]} | {:error, atom | Redix.Error.t()}
   def pipeline(conn, commands, opts \\ []),
     do: do_pipeline(:pipeline, conn, commands, opts)
 
   @doc """
   """
-  @spec pipeline!(atom, [Redix.command()], keyword) :: [Redix.Protocol.redis_value()] | no_return
+  @spec pipeline!(Server.name(), [Redix.command()], keyword) ::
+          [Redix.Protocol.redis_value()] | no_return
   def pipeline!(conn, commands, opts \\ []),
     do: do_pipeline(:pipeline!, conn, commands, opts)
 
   @doc """
   """
-  @spec command(atom, Redix.command(), keyword) ::
+  @spec command(Server.name(), Redix.command(), keyword) ::
           {:ok, Redix.Protocol.redis_value()} | {:error, atom | Redix.Error.t()}
   def command(conn, command, opts \\ []),
     do: do_pipeline(:command, conn, command, opts)
 
   @doc """
   """
-  @spec command!(atom, Redix.command(), keyword) :: Redix.Protocol.redis_value() | no_return
+  @spec command!(Server.name(), Redix.command(), keyword) ::
+          Redix.Protocol.redis_value() | no_return
   def command!(conn, command, opts \\ []),
     do: do_pipeline(:command!, conn, command, opts)
 
   @doc """
   """
-  @spec pipeline_to_all_shards(atom, [Redix.command()], keyword) :: %{
-          atom => {:ok, [Redix.Protocol.redis_value()]} | {:error, atom | Redix.Error.t()}
+  @spec pipeline_to_all_shards(Server.name(), [Redix.command()], keyword) :: %{
+          Shard.name() => {:ok, [Redix.Protocol.redis_value()]} | {:error, atom | Redix.Error.t()}
         }
   def pipeline_to_all_shards(conn, commands, opts \\ []) do
     shards = :ets.lookup_element(conn, :shards, 2)
@@ -109,8 +113,8 @@ defmodule RedisZ do
 
   @doc """
   """
-  @spec command_to_all_shards(atom, Redix.command(), keyword) :: %{
-          atom => {:ok, Redix.Protocol.redis_value()} | {:error, atom | Redix.Error.t()}
+  @spec command_to_all_shards(Server.name(), Redix.command(), keyword) :: %{
+          Shard.name() => {:ok, Redix.Protocol.redis_value()} | {:error, atom | Redix.Error.t()}
         }
   def command_to_all_shards(conn, command, opts \\ []) do
     for {shard, result} <- pipeline_to_all_shards(conn, [command], opts),
@@ -123,7 +127,7 @@ defmodule RedisZ do
         do: {shard, result}
   end
 
-  @spec do_pipeline(atom, atom, [Redix.command()] | Redix.command(), keyword) :: term
+  @spec do_pipeline(atom, Server.name(), [Redix.command()] | Redix.command(), keyword) :: term
   defp do_pipeline(fun_name, conn, commands, opts) do
     args = :ets.tab2list(conn)
 

@@ -38,6 +38,12 @@ Call RedisZ like Redix.
 [3600, "Hello"] = RedisZ.pipeline!(Example.Redis, [["TTL", "mykey"], ["GET", "mykey"]])
 ```
 
+You can specify shard like Redis Cluster. `{momonga}1` & `{momonga}2` are stored at the same shard.
+
+```elixir
+["OK", "OK"] = RedisZ.pipeline!(Example.Redis, ["SET", "{momonga}1", "Hello"], ["SET", "{momonga}2", "Hello"])
+```
+
 Installation
 --
 Add `:redis_z` at `mix.exs`.
@@ -52,7 +58,7 @@ end
 
 Architecture
 --
-![processes](./processes.png)
+![processes](https://github.com/ne-sachirou/redis_z/raw/master/processes.png)
 
 TODO
 --

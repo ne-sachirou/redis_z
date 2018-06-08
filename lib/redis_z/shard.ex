@@ -7,9 +7,13 @@ defmodule RedisZ.Shard do
 
   use Supervisor
 
+  @type name :: GenServer.server()
+
+  @doc false
   @spec start_link(keyword) :: Supervisor.on_start()
   def start_link(args), do: Supervisor.start_link(__MODULE__, args)
 
+  @doc false
   @spec init(keyword) :: {:ok, {:supervisor.sup_flags(), [:supervisor.child_spec()]}} | :ignore
   def init(args) do
     args = put_in(args[:pool_name], :"#{args[:name]}.Pool")
@@ -25,27 +29,27 @@ defmodule RedisZ.Shard do
 
   @doc """
   """
-  @spec pipeline(atom, [Redix.command()], keyword) ::
+  @spec pipeline(name, [Redix.command()], keyword) ::
           {:ok, [Redix.Protocol.redis_value()]} | {:error, atom | Redix.Error.t()}
   def pipeline(conn, commands, opts \\ []), do: do_apply(:pipeline, conn, commands, opts)
 
   @doc """
   """
-  @spec pipeline!(atom, [Redix.command()], keyword) :: [Redix.Protocol.redis_value()] | no_return
+  @spec pipeline!(name, [Redix.command()], keyword) :: [Redix.Protocol.redis_value()] | no_return
   def pipeline!(conn, commands, opts \\ []), do: do_apply(:pipeline!, conn, commands, opts)
 
   @doc """
   """
-  @spec command(atom, Redix.command(), keyword) ::
+  @spec command(name, Redix.command(), keyword) ::
           {:ok, Redix.Protocol.redis_value()} | {:error, atom | Redix.Error.t()}
   def command(conn, command, opts \\ []), do: do_apply(:command, conn, command, opts)
 
   @doc """
   """
-  @spec command!(atom, Redix.command(), keyword) :: Redix.Protocol.redis_value() | no_return
+  @spec command!(name, Redix.command(), keyword) :: Redix.Protocol.redis_value() | no_return
   def command!(conn, command, opts \\ []), do: do_apply(:command!, conn, command, opts)
 
-  @spec do_apply(atom, atom, [Redix.command()], keyword) :: term
+  @spec do_apply(atom, name, [Redix.command()], keyword) :: term
   defp do_apply(fun_name, conn, commands, opts) do
     server_name = conn |> Module.split() |> Enum.slice(0..-3) |> Module.concat()
     args = Enum.find(:ets.tab2list(server_name)[:shards], &(&1[:name] === conn))
@@ -54,7 +58,7 @@ defmodule RedisZ.Shard do
     do_apply_with_retry(fun_name, redix_conn, commands, opts)
   end
 
-  @spec do_apply_with_retry(atom, atom, [Redix.command()], keyword) :: term
+  @spec do_apply_with_retry(atom, name, [Redix.command()], keyword) :: term
   defp do_apply_with_retry(fun_name, redix_conn, commands, opts)
        when fun_name in [:pipeline, :command] do
     with {:error, error} <- apply(Redix, fun_name, [redix_conn, commands, opts]),

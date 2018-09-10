@@ -1,6 +1,6 @@
 defmodule RedisZ.Shard do
   @moduledoc """
-  Parallel connection pooling.
+  A shard corresponds to a Redis server. It has `Redix` workers under a `RedisZ.Pool`.
   """
 
   alias RedisZ.{Diagnoser, Pool, PoolStarter}

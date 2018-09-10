@@ -1,5 +1,6 @@
 defmodule RedisZ.ShardsStarter do
   @moduledoc """
+  Start `RedisZ.Shard` workers under `RedisZ.Shards`.
   """
 
   alias RedisZ.Shard

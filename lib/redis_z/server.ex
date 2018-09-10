@@ -1,5 +1,6 @@
 defmodule RedisZ.Server do
   @moduledoc """
+  Manage ETS which lists `RedisZ.Shard` workers.
   """
 
   use GenServer

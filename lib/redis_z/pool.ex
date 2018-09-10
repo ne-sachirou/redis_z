@@ -1,5 +1,8 @@
 defmodule RedisZ.Pool do
   @moduledoc """
+  Parallel & concurrent Redix connection pool.
+
+  cf. [https://hexdocs.pm/redix/real-world-usage.html](https://hexdocs.pm/redix/real-world-usage.html)
   """
 
   use DynamicSupervisor
@@ -15,6 +18,7 @@ defmodule RedisZ.Pool do
     do: DynamicSupervisor.init(strategy: :one_for_one, max_restarts: args[:pool_size] * 1000)
 
   @doc """
+  Get a random Redix connection from the pool.
   """
   @spec get_conn(name, non_neg_integer) :: atom
   def get_conn(pool_name, pool_size),

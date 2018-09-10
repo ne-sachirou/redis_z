@@ -1,6 +1,27 @@
 defmodule RedisZ do
   @moduledoc """
-  RedisZ - Redis Super: Full featured Redis adapter for Elixir based on Redix.
+  Pooling & sharding support parallel Redis adapter base on `Redix`.
+
+  Start RedisZ in your application.
+
+  ```
+  children = [
+    {RedisZ, name: Example.Redis, pool_size: 4, urls: ["redis://localhost/0", "redis://localhost/1"]},
+  ]
+  ```
+
+  Call RedisZ like Redix.
+
+  ```
+  "OK" = RedisZ.command!(Example.Redis, ["SETEX", "mykey", 10, "Hello"])
+  [10, "Hello"] = RedisZ.pipeline!(Example.Redis, [["TTL", "mykey"], ["GET", "mykey"]])
+  ```
+
+  You can specify shard [like Redis Cluster](https://redis.io/topics/cluster-spec#keys-hash-tags). `{momonga}1` & `{momonga}2` are stored at the same shard.
+
+  ```
+  ["OK", "OK"] = RedisZ.pipeline!(Example.Redis, ["SET", "{momonga}1", "Hello"], ["SET", "{momonga}2", "Hello"])
+  ```
   """
 
   alias __MODULE__.{Diagnoser, Pool, Server, Shard, Shards, ShardsStarter}
@@ -61,6 +82,7 @@ defmodule RedisZ do
   end
 
   @doc """
+  Act like `Redix.pipeline/3` through shards & connnection pool.
   """
   @spec pipeline(Server.name(), [Redix.command()], keyword) ::
           {:ok, [Redix.Protocol.redis_value()]} | {:error, atom | Redix.Error.t()}
@@ -68,6 +90,7 @@ defmodule RedisZ do
     do: do_pipeline(:pipeline, conn, commands, opts)
 
   @doc """
+  Act like `Redix.pipeline!/3` through shards & connnection pool.
   """
   @spec pipeline!(Server.name(), [Redix.command()], keyword) ::
           [Redix.Protocol.redis_value()] | no_return
@@ -75,6 +98,7 @@ defmodule RedisZ do
     do: do_pipeline(:pipeline!, conn, commands, opts)
 
   @doc """
+  Act like `Redix.command/3` through shards & connnection pool.
   """
   @spec command(Server.name(), Redix.command(), keyword) ::
           {:ok, Redix.Protocol.redis_value()} | {:error, atom | Redix.Error.t()}
@@ -82,6 +106,7 @@ defmodule RedisZ do
     do: do_pipeline(:command, conn, command, opts)
 
   @doc """
+  Act like `Redix.command!/3` through shards & connnection pool.
   """
   @spec command!(Server.name(), Redix.command(), keyword) ::
           Redix.Protocol.redis_value() | no_return
@@ -89,6 +114,7 @@ defmodule RedisZ do
     do: do_pipeline(:command!, conn, command, opts)
 
   @doc """
+  `pipeline/3` to each shards & collect the resutls.
   """
   @spec pipeline_to_all_shards(Server.name(), [Redix.command()], keyword) :: %{
           Shard.name() => {:ok, [Redix.Protocol.redis_value()]} | {:error, atom | Redix.Error.t()}
@@ -103,15 +129,15 @@ defmodule RedisZ do
       on_timeout: :kill_task
     )
     |> Enum.zip(shards)
-    |> Enum.map(fn
+    |> Enum.into(%{}, fn
       {{:ok, {:ok, values}}, shard} -> {shard[:name], {:ok, values}}
       {{:ok, {:error, reason}}, shard} -> {shard[:name], {:error, reason}}
       {reason, shard} -> {shard[:name], {:error, reason}}
     end)
-    |> Enum.into(%{})
   end
 
   @doc """
+  `command/3` to each shards & collect the resutls.
   """
   @spec command_to_all_shards(Server.name(), Redix.command(), keyword) :: %{
           Shard.name() => {:ok, Redix.Protocol.redis_value()} | {:error, atom | Redix.Error.t()}

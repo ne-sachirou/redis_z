@@ -5,8 +5,12 @@ defmodule RedisZ.MixProject do
     [
       app: :redis_z,
       deps: deps(),
-      description: "Redis Super: Full featured Redis adapter for Elixir based on Redix",
-      dialyzer: [ignore_warnings: "dialyzer.ignore-warnings"],
+      description: "Pooling & sharding support parallel Redis adapter base on Redix.",
+      dialyzer: [
+        flags: [:no_undefined_callbacks],
+        ignore_warnings: "dialyzer.ignore-warnings",
+        remove_defaults: [:unknown]
+      ],
       elixir: "~> 1.6",
       package: package(),
       preferred_cli_env: [
@@ -17,7 +21,7 @@ defmodule RedisZ.MixProject do
       ],
       start_permanent: Mix.env() == :prod,
       test_coverage: [tool: ExCoveralls],
-      version: "0.1.0",
+      version: "0.2.0",
 
       # Docs
       docs: [
@@ -34,7 +38,7 @@ defmodule RedisZ.MixProject do
 
   defp deps do
     [
-      {:ex_doc, "~> 0.18", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:inner_cotton, github: "ne-sachirou/inner_cotton", only: [:dev, :test]},
       {:redix, "~> 0.6"}
     ]

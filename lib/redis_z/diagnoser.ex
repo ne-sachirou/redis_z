@@ -1,6 +1,8 @@
 defmodule RedisZ.Diagnoser do
   @moduledoc """
   Auto reconnect at Amazon ElastiCache Multi-AZ failover.
+
+  cf. [https://rubygems.org/gems/redis-elasticache](https://rubygems.org/gems/redis-elasticache)
   """
 
   use GenServer

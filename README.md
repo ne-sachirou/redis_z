@@ -1,11 +1,11 @@
 RedisZ - Redis Super
 ==
-Full featured Redis adapter for Elixir based on [Redix][Redix].
+Pooling & sharding support parallel Redis adapter base on [Redix][Redix].
 
 * No downgrade from Redix: pipeline concurrency & auto reconnection.
-* Parallel connection pooling.
+* [Parallel connection pooling](https://hexdocs.pm/redix/real-world-usage.html).
 * Sharding support.
-* Auto reconnect at Amazon ElastiCache Multi-AZ failover.
+* [Auto reconnect at Amazon ElastiCache Multi-AZ failover.](https://rubygems.org/gems/redis-elasticache)
 
 [![Hex.pm](https://img.shields.io/hexpm/v/redis_z.svg)](https://hex.pm/packages/redis_z)
 [![Build Status](https://travis-ci.org/ne-sachirou/redis_z.svg?branch=master)](https://travis-ci.org/ne-sachirou/redis_z)
@@ -35,10 +35,10 @@ Call RedisZ like Redix.
 
 ```elixir
 "OK" = RedisZ.command!(Example.Redis, ["SETEX", "mykey", 10, "Hello"])
-[3600, "Hello"] = RedisZ.pipeline!(Example.Redis, [["TTL", "mykey"], ["GET", "mykey"]])
+[10, "Hello"] = RedisZ.pipeline!(Example.Redis, [["TTL", "mykey"], ["GET", "mykey"]])
 ```
 
-You can specify shard like Redis Cluster. `{momonga}1` & `{momonga}2` are stored at the same shard.
+You can specify shard [like Redis Cluster](https://redis.io/topics/cluster-spec#keys-hash-tags). `{momonga}1` & `{momonga}2` are stored at the same shard.
 
 ```elixir
 ["OK", "OK"] = RedisZ.pipeline!(Example.Redis, ["SET", "{momonga}1", "Hello"], ["SET", "{momonga}2", "Hello"])
@@ -51,7 +51,7 @@ Add `:redis_z` at `mix.exs`.
 ```elixir
 def deps do
   [
-    {:redis_z, "~> 0.1"}
+    {:redis_z, "~> 0.2"}
   ]
 end
 ```

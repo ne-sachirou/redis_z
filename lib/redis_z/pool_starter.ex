@@ -1,5 +1,6 @@
 defmodule RedisZ.PoolStarter do
   @moduledoc """
+  Start `Redix` workers under `RedisZ.Pool`.
   """
 
   use Task, restart: :transient

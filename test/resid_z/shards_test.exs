@@ -4,7 +4,7 @@ defmodule RedisZTest.Shards do
   use ExUnitProperties
   use ExUnit.Case
 
-  doctest RedisZ.Shards
+  doctest Shards
 
   describe "select_shard/2" do
     test """

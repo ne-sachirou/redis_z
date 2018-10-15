@@ -5,6 +5,6 @@
     pool_size: 2
   )
 
-Process.sleep(1000)
+Process.sleep(100)
 RedisZ.command_to_all_shards(RedisZTest, ["FLUSHDB"])
 ExUnit.start()

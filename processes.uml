@@ -1,0 +1,75 @@
+@startuml
+title Processes
+
+object You
+object "Redis" as RedisA
+object "Redis" as RedisB
+
+package RedisZ {
+  object RedisZ {
+    urls = "a,b"
+    pool_size = 2
+  }
+  object Diagnoser
+  object Server
+  object ETS
+  object Shards
+  object ShardsStarter
+  object "Shard" as ShardA {
+    url = "a"
+    pool_size = 2
+  }
+  object "Shard" as ShardB {
+    url = "b"
+    pool_size = 2
+  }
+  object "Pool" as PoolA {
+    url = "a"
+    pool_size = 2
+  }
+  object "PoolStarter" as PoolStarterA
+  object "Pool" as PoolB {
+    url = "b"
+    pool_size = 2
+  }
+  object "PoolStarter" as PoolStarterB
+  Object "Redix" as RedixA1 {
+    url = "a"
+  }
+  Object "Redix" as RedixA2 {
+    url = "a"
+  }
+  Object "Redix" as RedixB1 {
+    url = "b"
+  }
+  Object "Redix" as RedixB2 {
+    url = "b"
+  }
+}
+
+RedisZ <|-- Diagnoser
+RedisZ <|-- Server
+Server <|-- ETS
+RedisZ <|-- Shards
+RedisZ <|-- ShardsStarter
+Shards <|.. ShardsStarter : start
+Shards <|-- ShardA
+Shards <|-- ShardB
+ShardA <|-- PoolA
+ShardA <|-- PoolStarterA
+PoolA <|.. PoolStarterA : start
+ShardB <|-- PoolB
+ShardB <|-- PoolStarterB
+PoolB <|.. PoolStarterB : start
+PoolA <|-- RedixA1
+PoolA <|-- RedixA2
+PoolB <|-- RedixB1
+PoolB <|-- RedixB2
+
+ETS <|.. You : read
+You ..|> RedixA1 : command
+RedixA1 ..|> RedisA : pipeline
+RedixA2 ..|> RedisA : pipeline
+RedixB1 ..|> RedisB : pipeline
+RedixB2 ..|> RedisB : pipeline
+@enduml

@@ -1,7 +1,7 @@
 {:ok, _} =
   RedisZ.start_link(
     name: RedisZTest,
-    urls: ["redis://localhost/0", "redis://localhost/1"],
+    urls: ["redis://localhost:6379/0", "redis://localhost:6379/1"],
     pool_size: 2
   )
 

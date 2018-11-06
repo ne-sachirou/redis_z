@@ -17,7 +17,20 @@ defmodule RedisZ.PoolStarter do
     else
       for i <- 1..args[:pool_size] do
         spec = Supervisor.Spec.worker(Redix, [args[:url], [name: :"#{args[:pool_name]}.#{i}"]])
-        {:ok, _} = DynamicSupervisor.start_child(args[:pool_name], spec)
+
+        case DynamicSupervisor.start_child(args[:pool_name], spec) do
+          {:ok, _} ->
+            nil
+
+          {:ok, _, _} ->
+            nil
+
+          {:error, {error, stacktrace}} when is_map(error) and is_list(stacktrace) ->
+            reraise error, stacktrace
+
+          reason ->
+            raise reason
+        end
       end
     end
   end

@@ -24,7 +24,19 @@ defmodule RedisZ.ShardsStarter do
           |> put_in([:url], url)
           |> put_in([:name], :"#{args[:shards_name]}.#{i}")
 
-        {:ok, _} = DynamicSupervisor.start_child(args[:shards_name], {Shard, args})
+        case DynamicSupervisor.start_child(args[:shards_name], {Shard, args}) do
+          {:ok, _} ->
+            nil
+
+          {:ok, _, _} ->
+            nil
+
+          {:error, {error, stacktrace}} when is_map(error) and is_list(stacktrace) ->
+            reraise error, stacktrace
+
+          reason ->
+            raise reason
+        end
       end
     end
   end

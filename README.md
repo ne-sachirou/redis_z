@@ -9,6 +9,7 @@ Pooling & sharding support parallel Redis adapter base on [Redix][Redix].
 
 [![Hex.pm](https://img.shields.io/hexpm/v/redis_z.svg)](https://hex.pm/packages/redis_z)
 [![Build Status](https://travis-ci.org/ne-sachirou/redis_z.svg?branch=master)](https://travis-ci.org/ne-sachirou/redis_z)
+[![Coverage Status](https://coveralls.io/repos/github/ne-sachirou/redis_z/badge.svg)](https://coveralls.io/github/ne-sachirou/redis_z)
 
 Usage
 --

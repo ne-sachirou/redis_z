@@ -16,7 +16,10 @@ defmodule RedisZ.PoolStarter do
       run(args)
     else
       for i <- 1..args[:pool_size] do
-        spec = Supervisor.Spec.worker(Redix, [args[:url], [name: :"#{args[:pool_name]}.#{i}"]])
+        spec = %{
+          id: Redix,
+          start: {Redix, :start_link, [args[:url], [name: :"#{args[:pool_name]}.#{i}"]]}
+        }
 
         case DynamicSupervisor.start_child(args[:pool_name], spec) do
           {:ok, _} ->

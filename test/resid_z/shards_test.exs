@@ -48,10 +48,12 @@ defmodule RedisZTest.Shards do
     property "Simple hash tags" do
       args = [shards: [[name: A], [name: B]]]
 
-      check all part <- string(:printable),
-                part !== "",
-                not String.contains?(part, ["{", "}"]),
-                key = "#{part}{#{part}}#{part}" do
+      check all(
+              part <- string(:printable),
+              part !== "",
+              not String.contains?(part, ["{", "}"]),
+              key = "#{part}{#{part}}#{part}"
+            ) do
         assert Shards.select_shard(part, args) === Shards.select_shard(key, args)
       end
     end

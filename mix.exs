@@ -40,7 +40,7 @@ defmodule RedisZ.MixProject do
     [
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:inner_cotton, github: "ne-sachirou/inner_cotton", only: [:dev, :test]},
-      {:redix, "~> 0.6"}
+      {:redix, "~> 1.0"}
     ]
   end
 

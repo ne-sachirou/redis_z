@@ -36,7 +36,9 @@ defmodule RedisZ.Shards do
   """
   @spec assign_commands!([Redix.command()], keyword) :: Shard.name()
   def assign_commands!(commands, args) do
-    with [shard | _] <- shards = Enum.map(commands, &assign_command!(&1, args)),
+    shards = Enum.map(commands, &assign_command!(&1, args))
+
+    with [shard | _] <- shards,
          1 <- shards |> MapSet.new() |> MapSet.size() do
       shard
     else
@@ -46,7 +48,9 @@ defmodule RedisZ.Shards do
 
   @spec assign_command!(Redix.command(), keyword) :: Shard.name()
   defp assign_command!(command, args) do
-    with [shard | _] <- shards = command |> Command.keys() |> Enum.map(&select_shard(&1, args)),
+    shards = command |> Command.keys() |> Enum.map(&select_shard(&1, args))
+
+    with [shard | _] <- shards,
          1 <- shards |> MapSet.new() |> MapSet.size() do
       shard
     else
